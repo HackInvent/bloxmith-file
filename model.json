@@ -1,0 +1,26 @@
+{
+  "kind": "file",
+  "title": "File Path",
+  "ports": {
+    "inputs": [],
+    "outputs": [
+      {
+        "id": 1,
+        "name": "fichier",
+        "title": "Out",
+        "emits": ["file/path", "message/*"],
+        "multiplicity": "many"
+      }
+    ]
+  },
+  "config": {
+    "path": "./input.txt",
+    "create_if_missing": false
+  },
+  "runtime": {
+    "initial_state": "ready",
+    "active_worker": true,
+    "generic_source": true,
+    "file_source": true
+  }
+}
