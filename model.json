@@ -1,7 +1,9 @@
 {
   "kind": "file",
   "version": "0.1.0",
-  "bloxsmith_compatibility": ["1.0.9"],
+  "bloxsmith_compatibility": [
+    "1.0.9"
+  ],
   "tested_with_bloxsmith": "1.0.9",
   "title": "File Path",
   "ports": {
@@ -11,7 +13,10 @@
         "id": 1,
         "name": "fichier",
         "title": "Out",
-        "emits": ["file/path", "message/*"],
+        "emits": [
+          "file/path",
+          "message/*"
+        ],
         "multiplicity": "many"
       }
     ]
@@ -25,5 +30,35 @@
     "active_worker": true,
     "generic_source": true,
     "file_source": true
+  },
+  "ui_assets": {
+    "modal": [
+      {
+        "kind": "css",
+        "path": "assets/css/inspector_panel.css"
+      },
+      {
+        "kind": "js",
+        "path": "assets/js/common.js"
+      },
+      {
+        "kind": "js",
+        "path": "assets/js/block_modal.js"
+      }
+    ],
+    "inspector_panel": [
+      {
+        "kind": "css",
+        "path": "assets/css/inspector_panel.css"
+      },
+      {
+        "kind": "js",
+        "path": "assets/js/common.js"
+      },
+      {
+        "kind": "js",
+        "path": "assets/js/inspector_panel.js"
+      }
+    ]
   }
 }

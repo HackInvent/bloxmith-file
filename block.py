@@ -32,26 +32,6 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
     """Autonomous block implementation for `FileBlock`."""
     kind = "file"
 
-    def ui_assets(self, surface: str = "modal") -> list[dict[str, str]]:
-        """Return block-owned frontend assets for the requested UI surface.
-
-        Args:
-            surface: UI surface requesting assets.
-        """
-        if surface == "modal":
-            return [
-                {"kind": "css", "path": "assets/css/inspector_panel.css"},
-                {"kind": "js", "path": "assets/js/common.js"},
-                {"kind": "js", "path": "assets/js/block_modal.js"},
-            ]
-        if surface == "inspector_panel":
-            return [
-                {"kind": "css", "path": "assets/css/inspector_panel.css"},
-                {"kind": "js", "path": "assets/js/common.js"},
-                {"kind": "js", "path": "assets/js/inspector_panel.js"},
-            ]
-        return []
-
     def render_modal(self, *, node: dict[str, Any], payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Render the File Path modal with the shared path browser control."""
 

@@ -26,9 +26,16 @@ from urllib.parse import quote
 from urllib.request import urlopen
 
 from ui_smoke_common import expect, http_json, isolated_server
+from block_test_packages import install_test_package, release_key, surface_payload
 
 
 def assert_file_panel(server, kind: str, expected_hint: str) -> None:
+    """Vérifie les surfaces d'un bloc fichier via le contrat de release installé."""
+    # Les surfaces sont des assets de release : le bundled kind n'en sert aucun.
+    model = install_test_package(server, kind)
+    key = quote(release_key(model), safe="")
+    served = lambda payload, suffix: next(
+        asset["path"] for asset in payload["assets"] if asset["path"].endswith(suffix))
     node = {
         "id": f"{kind}-1",
         "kind": kind,
@@ -36,7 +43,7 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
         "title": kind,
         "config": {"path": "exports/source.txt", "create_if_missing": True},
     }
-    rendered = http_json(server.base_url, f"/api/blocks/{kind}/inspector-panel", method="POST", payload={"node": node})
+    rendered = surface_payload(server, model, node, "inspector_panel")
     html = str(rendered.get("html") or "")
     expect("data-file-inspector-root" in html, f"Le HTML inspecteur {kind} doit venir du bloc.")
     expect("data-file-path" in html, f"Le panneau inspecteur {kind} doit contenir le champ chemin.")
@@ -46,30 +53,17 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     expect("exports/source.txt" in html, f"Le panneau inspecteur {kind} doit lire node.config.path.")
     expect("checked" in html, f"Le panneau inspecteur {kind} doit lire node.config.create_if_missing.")
     expect(expected_hint in html, f"Le panneau inspecteur {kind} doit afficher le hint adapté.")
-    assets = rendered.get("assets") or []
-    expect(
-        {"kind": "css", "path": "assets/css/inspector_panel.css"} in assets,
-        f"Le CSS inspecteur {kind} doit être déclaré par le bloc.",
-    )
     if kind == "file":
-        expect(
-            {"kind": "js", "path": "assets/js/common.js"} in assets,
-            f"Le JS commun inspecteur {kind} doit être déclaré par le bloc.",
-        )
         inspector_asset_paths = ("assets/css/inspector_panel.css", "assets/js/common.js", "assets/js/inspector_panel.js")
     else:
         inspector_asset_paths = ("assets/css/inspector_panel.css", "assets/js/inspector_panel.js")
-    expect(
-        {"kind": "js", "path": "assets/js/inspector_panel.js"} in assets,
-        f"Le JS inspecteur {kind} doit être déclaré par le bloc.",
-    )
 
     for asset_path in inspector_asset_paths:
-        with urlopen(f"{server.base_url}/api/blocks/{kind}/assets/{asset_path}", timeout=5) as response:
+        with urlopen(f"{server.base_url}/api/blocks/{key}/assets/{served(rendered, asset_path)}", timeout=5) as response:
             body = response.read().decode("utf-8")
         expect("file" in body.lower(), f"Asset inspecteur {kind} non servi: {asset_path}")
 
-    modal = http_json(server.base_url, f"/api/blocks/{kind}/modal", method="POST", payload={"node": node, "runtime": {}})
+    modal = surface_payload(server, model, node, "modal")
     modal_html = str(modal.get("html") or "")
     expect("data-file-modal-root" in modal_html, f"Le modal {kind} doit venir du bloc.")
     if kind == "file":
@@ -78,30 +72,8 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     expect("data-path-browser-panel" in modal_html, f"Le modal {kind} doit exposer le navigateur fichier.")
     expect("data-file-apply" in modal_html, f"Le modal {kind} doit exposer l'action fichier.")
     expect("exports/source.txt" in modal_html, f"Le modal {kind} doit lire node.config.path.")
-    modal_assets = modal.get("assets") or []
-    expect(
-        {"kind": "css", "path": "assets/css/inspector_panel.css"} in modal_assets,
-        f"Le CSS modal {kind} doit être déclaré par le bloc.",
-    )
-    if kind == "file":
-        expect(
-            {"kind": "js", "path": "assets/js/common.js"} in modal_assets,
-            f"Le JS commun modal {kind} doit être déclaré par le bloc.",
-        )
-        expect(
-            {"kind": "js", "path": "assets/js/block_modal.js"} in modal_assets,
-            f"Le JS modal {kind} doit être déclaré par le bloc.",
-        )
-        expect(
-            {"kind": "js", "path": "assets/js/inspector_panel.js"} not in modal_assets,
-            f"Le modal {kind} ne doit pas charger le JS inspecteur.",
-        )
-    else:
-        expect(
-            {"kind": "js", "path": "assets/js/inspector_panel.js"} in modal_assets,
-            f"Le JS modal {kind} doit être déclaré par le bloc.",
-        )
-
+    # surface_payload vérifie que le modal sert exactement les assets déclarés,
+    # donc qu'il ne charge pas le JS d'une autre surface.
     source = server.root_dir / "exports" / "source.txt"
     source.parent.mkdir(parents=True, exist_ok=True)
     source.write_text("source", encoding="utf-8")
@@ -145,7 +117,7 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
         f"La mise à jour modale {kind} doit renvoyer le patch file attendu.",
     )
 
-    card = http_json(server.base_url, f"/api/blocks/{kind}/node-card", method="POST", payload={"node": node})
+    card = surface_payload(server, model, node, "node_card")
     card_html = str(card.get("html") or "")
     expect("source.txt" in card_html, f"La node_card {kind} doit afficher uniquement le nom du fichier.")
     expect(">exports/source.txt<" not in card_html, f"La node_card {kind} ne doit pas afficher le chemin complet.")
