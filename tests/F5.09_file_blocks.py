@@ -101,7 +101,7 @@ def main() -> None:
 
         expect(run.get("status") == "success", "The file/file_content run must succeed.")
         file_output = output_value_by_content_type(run, "file/path")
-        expect(Path(str(file_output.get("value") or "")).resolve() == source.resolve(), "Le bloc file n'émet pas le chemin absolu attendu.")
+        expect(Path(str(file_output.get("value") or "")).resolve() == source.resolve(), "The file block does not emit the expected absolute path.")
         expect(file_output.get("content_type") == "file/path", "The file content_type must be file/path.")
         expect(output_value_by_content_type(run, "text/plain").get("value") == "contenu fichier F5", "The file content is wrong.")
         expect("contenu fichier F5" in worker_received_by_title(run, "Affichage contenu"), "Display does not receive the content.")

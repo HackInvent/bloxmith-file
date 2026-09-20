@@ -54,7 +54,7 @@ export function mountFileEditor(root, api, { actionName, successMessage }) {
       api.log?.(successMessage);
     } catch (error) {
       setDirty(true);
-      api.log?.(`[error] Mise à jour File Path impossible: ${error.message}`);
+      api.log?.(`[error] File Path update failed: ${error.message}`);
     }
   };
 

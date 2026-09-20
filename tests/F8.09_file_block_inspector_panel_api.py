@@ -45,14 +45,14 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     }
     rendered = surface_payload(server, model, node, "inspector_panel")
     html = str(rendered.get("html") or "")
-    expect("data-file-inspector-root" in html, f"Le HTML inspecteur {kind} doit venir du bloc.")
-    expect("data-file-path" in html, f"Le panneau inspecteur {kind} doit contenir le champ chemin.")
-    expect("data-file-apply" in html, f"Le panneau inspecteur {kind} doit exposer le bouton Appliquer.")
-    expect("data-path-browser" in html, f"Le panneau inspecteur {kind} doit utiliser le path browser commun.")
-    expect("data-path-browser-panel" in html, f"Le panneau inspecteur {kind} doit exposer le navigateur fichier owned par le bloc.")
-    expect("exports/source.txt" in html, f"Le panneau inspecteur {kind} doit lire node.config.path.")
-    expect("checked" in html, f"Le panneau inspecteur {kind} doit lire node.config.create_if_missing.")
-    expect(expected_hint in html, f"Le panneau inspecteur {kind} doit afficher le hint adapté.")
+    expect("data-file-inspector-root" in html, f"The {kind} inspector HTML must come from the block.")
+    expect("data-file-path" in html, f"The {kind} inspector panel must contain the path field.")
+    expect("data-file-apply" in html, f"The {kind} inspector panel must expose the Apply button.")
+    expect("data-path-browser" in html, f"The {kind} inspector panel must use the shared path browser.")
+    expect("data-path-browser-panel" in html, f"The {kind} inspector panel must expose the block-owned file browser.")
+    expect("exports/source.txt" in html, f"The {kind} inspector panel must read node.config.path.")
+    expect("checked" in html, f"The {kind} inspector panel must read node.config.create_if_missing.")
+    expect(expected_hint in html, f"The {kind} inspector panel must show the matching hint.")
     if kind == "file":
         inspector_asset_paths = ("assets/css/inspector_panel.css", "assets/js/common.js", "assets/js/inspector_panel.js")
     else:
@@ -61,16 +61,16 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     for asset_path in inspector_asset_paths:
         with urlopen(f"{server.base_url}/api/blocks/{key}/assets/{served(rendered, asset_path)}", timeout=5) as response:
             body = response.read().decode("utf-8")
-        expect("file" in body.lower(), f"Asset inspecteur {kind} non servi: {asset_path}")
+        expect("file" in body.lower(), f"{kind} inspector asset not served: {asset_path}")
 
     modal = surface_payload(server, model, node, "modal")
     modal_html = str(modal.get("html") or "")
-    expect("data-file-modal-root" in modal_html, f"Le modal {kind} doit venir du bloc.")
+    expect("data-file-modal-root" in modal_html, f"The {kind} modal must come from the block.")
     if kind == "file":
-        expect("data-block-runtime-refresh=\"autonomous\"" in modal_html, f"Le modal {kind} doit gérer son refresh runtime.")
-    expect("data-path-browser" in modal_html, f"Le modal {kind} doit utiliser le path browser commun.")
-    expect("data-path-browser-panel" in modal_html, f"Le modal {kind} doit exposer le navigateur fichier.")
-    expect("data-file-apply" in modal_html, f"Le modal {kind} doit exposer l'action fichier.")
+        expect("data-block-runtime-refresh=\"autonomous\"" in modal_html, f"The {kind} modal must own its runtime refresh.")
+    expect("data-path-browser" in modal_html, f"The {kind} modal must use the shared path browser.")
+    expect("data-path-browser-panel" in modal_html, f"The {kind} modal must expose the file browser.")
+    expect("data-file-apply" in modal_html, f"The {kind} modal must expose the file action.")
     expect("exports/source.txt" in modal_html, f"The {kind} modal must read node.config.path.")
     # surface_payload checks that the modal serves exactly the declared assets,
     # so that it does not load the JS of another surface.
@@ -81,7 +81,7 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     entries = browser.get("entries") or []
     expect(
         any(entry.get("name") == "source.txt" for entry in entries),
-        f"Le navigateur fichier {kind} doit etre servi par /api/blocks/{kind}/browse-files.",
+        f"The {kind} file browser must be served by /api/blocks/{kind}/browse-files.",
     )
 
     applied = http_json(
@@ -119,9 +119,9 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
 
     card = surface_payload(server, model, node, "node_card")
     card_html = str(card.get("html") or "")
-    expect("source.txt" in card_html, f"La node_card {kind} doit afficher uniquement le nom du fichier.")
-    expect(">exports/source.txt<" not in card_html, f"La node_card {kind} ne doit pas afficher le chemin complet.")
-    expect('title="exports/source.txt"' in card_html, f"La node_card {kind} doit conserver le chemin complet en tooltip.")
+    expect("source.txt" in card_html, f"The {kind} node_card must show only the file name.")
+    expect(">exports/source.txt<" not in card_html, f"The {kind} node_card must not show the full path.")
+    expect('title="exports/source.txt"' in card_html, f"The {kind} node_card must keep the full path as a tooltip.")
 
 
 def main() -> None:
