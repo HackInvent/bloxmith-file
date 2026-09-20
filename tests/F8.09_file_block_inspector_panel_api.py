@@ -7,12 +7,12 @@
 # Created Date: 2024-03-30
 # -----------------------------------------------------------------------------
 
-"""F8.09 - UI modulaire des panneaux inspecteur File et File Content.
+"""F8.09 - Modular inspector panels of the File and File Content blocks.
 
-Le test démarre un serveur isolé, demande le rendu des panneaux inspecteur
-`file` et `file_content` depuis leurs `block.py`, vérifie les assets exposés,
-puis teste l'action structurée de mise à jour du chemin. Aucune donnée
-utilisateur n'est modifiée hors du serveur de test.
+The test starts an isolated server, renders the `file` and `file_content`
+inspector panels from their own `block.py`, checks the assets they expose, then
+exercises the structured path update action. No user data is modified outside
+the test server.
 """
 
 # Test cases:
@@ -30,8 +30,8 @@ from block_test_packages import install_test_package, release_key, surface_paylo
 
 
 def assert_file_panel(server, kind: str, expected_hint: str) -> None:
-    """Vérifie les surfaces d'un bloc fichier via le contrat de release installé."""
-    # Les surfaces sont des assets de release : le bundled kind n'en sert aucun.
+    """Check one file block's surfaces through the installed release contract."""
+    # Surfaces are release assets: a bundled kind serves none of them.
     model = install_test_package(server, kind)
     key = quote(release_key(model), safe="")
     served = lambda payload, suffix: next(
@@ -71,9 +71,9 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     expect("data-path-browser" in modal_html, f"Le modal {kind} doit utiliser le path browser commun.")
     expect("data-path-browser-panel" in modal_html, f"Le modal {kind} doit exposer le navigateur fichier.")
     expect("data-file-apply" in modal_html, f"Le modal {kind} doit exposer l'action fichier.")
-    expect("exports/source.txt" in modal_html, f"Le modal {kind} doit lire node.config.path.")
-    # surface_payload vérifie que le modal sert exactement les assets déclarés,
-    # donc qu'il ne charge pas le JS d'une autre surface.
+    expect("exports/source.txt" in modal_html, f"The {kind} modal must read node.config.path.")
+    # surface_payload checks that the modal serves exactly the declared assets,
+    # so that it does not load the JS of another surface.
     source = server.root_dir / "exports" / "source.txt"
     source.parent.mkdir(parents=True, exist_ok=True)
     source.write_text("source", encoding="utf-8")
@@ -97,9 +97,9 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     file_patch = applied.get("node_patch", {}).get("config")
     expect(
         file_patch == {"path": "exports/updated.txt", "create_if_missing": False},
-        f"La mise à jour {kind} doit renvoyer le patch file attendu.",
+        f"The {kind} update must return the expected file patch.",
     )
-    expect(applied.get("rerender_inspector") is False, f"La saisie {kind} ne doit pas forcer un rerender.")
+    expect(applied.get("rerender_inspector") is False, f"Typing in {kind} must not force a rerender.")
 
     modal_applied = http_json(
         server.base_url,
@@ -114,7 +114,7 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
     expect(
         modal_applied.get("node_patch", {}).get("config")
         == {"path": "exports/modal.txt", "create_if_missing": True},
-        f"La mise à jour modale {kind} doit renvoyer le patch file attendu.",
+        f"The {kind} modal update must return the expected file patch.",
     )
 
     card = surface_payload(server, model, node, "node_card")
@@ -126,8 +126,8 @@ def assert_file_panel(server, kind: str, expected_hint: str) -> None:
 
 def main() -> None:
     with isolated_server() as server:
-        assert_file_panel(server, "file", "Le bloc transmet uniquement le chemin")
-        assert_file_panel(server, "file_content", "Le bloc lit le fichier comme du texte")
+        assert_file_panel(server, "file", "The block only passes the path")
+        assert_file_panel(server, "file_content", "The block reads the file as text")
     print("[ok] F8.09_file_block_inspector_panel_api")
 
 

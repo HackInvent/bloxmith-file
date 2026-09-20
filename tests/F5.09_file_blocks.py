@@ -7,10 +7,10 @@
 # Created Date: 2024-02-22
 # -----------------------------------------------------------------------------
 
-"""F5.09 - Blocs File Path et Fichier Contenu.
+"""F5.09 - File Path and File Content blocks.
 
-Le test crée un fichier texte dans le projet temporaire, puis vérifie que le
-bloc `file` émet son chemin absolu et que `file_content` émet son contenu.
+The test creates a text file in the temporary project, then checks that the
+`file` block emits its absolute path and that `file_content` emits its content.
 """
 
 # Test cases:
@@ -99,12 +99,12 @@ def main() -> None:
         created = create_run_api(server, document, runtime_mode="centralized")
         run = wait_for_run_terminal(server, str(created.get("run_id") or ""))
 
-        expect(run.get("status") == "success", "Le run file/file_content doit réussir.")
+        expect(run.get("status") == "success", "The file/file_content run must succeed.")
         file_output = output_value_by_content_type(run, "file/path")
         expect(Path(str(file_output.get("value") or "")).resolve() == source.resolve(), "Le bloc file n'émet pas le chemin absolu attendu.")
-        expect(file_output.get("content_type") == "file/path", "Le content_type file doit être file/path.")
-        expect(output_value_by_content_type(run, "text/plain").get("value") == "contenu fichier F5", "Le contenu fichier est incorrect.")
-        expect("contenu fichier F5" in worker_received_by_title(run, "Affichage contenu"), "Display ne reçoit pas le contenu.")
+        expect(file_output.get("content_type") == "file/path", "The file content_type must be file/path.")
+        expect(output_value_by_content_type(run, "text/plain").get("value") == "contenu fichier F5", "The file content is wrong.")
+        expect("contenu fichier F5" in worker_received_by_title(run, "Affichage contenu"), "Display does not receive the content.")
     print("[ok] F5.09_file_blocks")
 
 

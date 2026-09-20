@@ -110,8 +110,8 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
     def _ui_hint(self) -> str:
         """Provide internal FileBlock behavior for `_ui_hint`."""
         return (
-            "Le bloc transmet uniquement le chemin au bloc Codex. "
-            "Si l'option est cochée, un fichier manquant est créé vide."
+            "The block only passes the path to the Codex block. "
+            "When the option is checked, a missing file is created empty."
         )
 
     def preview_received(self, *, node: Any, **runtime_services: Any) -> str:
