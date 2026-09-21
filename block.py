@@ -72,9 +72,12 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
         if self.kind != "file":
             raise NotImplementedError(f"Block '{self.kind}' does not implement render_node_card().")
         config = self._ui_file_config(node)
-        path = str(config.get("path") or "No path")
+        path = str(config.get("path") or self.translate("block.file.no_path", fallback="No path"))
         display_name = self._file_display_name(path)
-        mode = "created if missing" if config.get("create_if_missing") else "must exist"
+        # The card states one of two modes, so the marker carries the matching key.
+        mode_key = ("block.file.mode_created_if_missing" if config.get("create_if_missing")
+                    else "block.file.mode_must_exist")
+        mode = self.translate(mode_key, fallback="created if missing" if config.get("create_if_missing") else "must exist")
         return render_node_card_template(
             block=self,
             node=node,
@@ -84,6 +87,7 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
                 "path": escape(path),
                 "path_label": escape(display_name),
                 "mode": mode,
+                "mode_key": mode_key,
             },
         )
 
@@ -109,9 +113,10 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
 
     def _ui_hint(self) -> str:
         """Provide internal FileBlock behavior for `_ui_hint`."""
-        return (
-            "The block only passes the path to the Codex block. "
-            "When the option is checked, a missing file is created empty."
+        return self.translate(
+            "block.file.hint",
+            fallback=("The block only passes the path to the Codex block. "
+                      "When the option is checked, a missing file is created empty."),
         )
 
     def preview_received(self, *, node: Any, **runtime_services: Any) -> str:

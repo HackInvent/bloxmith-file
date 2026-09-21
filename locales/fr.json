@@ -1,0 +1,12 @@
+{
+  "block.file.model.title": "Chemin de fichier",
+  "block.file.pill": "Chemin de fichier",
+  "block.file.no_path": "Aucun chemin",
+  "block.file.mode_created_if_missing": "créé s'il manque",
+  "block.file.mode_must_exist": "doit exister",
+  "block.file.path_section": "Chemin du fichier",
+  "block.file.technical_section": "Attributs techniques",
+  "block.file.create_if_missing_label": "Créer le fichier s'il n'existe pas",
+  "block.file.apply_file": "Appliquer le fichier",
+  "block.file.hint": "Le bloc transmet uniquement le chemin au bloc Codex. Quand l'option est cochée, un fichier absent est créé vide."
+}
