@@ -72,9 +72,9 @@ class FileBlock(FilePathBlockMixin, BlockDefinition):
         if self.kind != "file":
             raise NotImplementedError(f"Block '{self.kind}' does not implement render_node_card().")
         config = self._ui_file_config(node)
-        path = str(config.get("path") or "Aucun chemin")
+        path = str(config.get("path") or "No path")
         display_name = self._file_display_name(path)
-        mode = "cree si absent" if config.get("create_if_missing") else "doit exister"
+        mode = "created if missing" if config.get("create_if_missing") else "must exist"
         return render_node_card_template(
             block=self,
             node=node,
