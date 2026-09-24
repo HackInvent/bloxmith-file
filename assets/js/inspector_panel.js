@@ -1,3 +1,5 @@
+import { withProperties } from "./properties.js";
+
 /**
  * Role: Mounts the file block inspector panel frontend asset.
  * File Name: inspector_panel.js
@@ -15,9 +17,14 @@ import { mountFileEditor } from "./common.js";
  * @param {object} api - Generic block UI API exposing block actions.
  * @returns {void}
  */
-export function mount(root, api) {
+function mountOwned(root, api) {
   mountFileEditor(root, api, {
     actionName: "inspector_update_file",
     successMessage: "[file] Configuration appliquee.",
   });
+}
+
+/** Keep the block behavior and add properties-only accessibility. */
+export function mount(root, ...args) {
+  return withProperties(mountOwned).call(this, root, ...args);
 }
