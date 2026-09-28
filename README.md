@@ -10,9 +10,6 @@ Verified BloxSmith versions: **1.0.9** (bundled-block tests; see [test evidence]
 
 [![FILE PATH — Resolves and emits a filesystem path, rather than reading file content.](media/thumbnail.webp)](media/cover.png)
 
-*Concept illustration. [Artwork and generation prompt](media/README.md).*
-
-
 ## Role
 
 `file` is the File Path source block. It resolves a filesystem path and emits it as a runtime value when downstream blocks need a file reference instead of file contents.
